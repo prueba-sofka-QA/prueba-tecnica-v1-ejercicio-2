@@ -1,0 +1,83 @@
+HALLAZGOS Y CONCLUSIONES - EJERCICIO 2
+
+
+1. COMPORTAMIENTO DE LA API DE DEMOBLAZE
+
+
+Hallazgos:
+- La API siempre retorna HTTP 200, incluso en casos de error. No se usan codigos
+  HTTP semanticos como 400 (Bad Request) o 401 (Unauthorized).
+- Las respuestas de exito y error usan formatos diferentes:
+  * Exito en signup: string plano vacio o mensaje de exito
+  * Exito en login: string plano con formato "Auth_token: <token>"
+  * Error en signup: JSON {"errorMessage":"This user already exist."}
+  * Error en login: JSON {"errorMessage":"User does not exist."}
+- Esta inconsistencia en el formato de respuesta obliga a manejar cada caso
+  de forma diferenciada en las validaciones.
+- El token de autenticacion retornado por login no es un JWT estandar, sino
+  un string codificado en base64.
+- La API no tiene mecanismo de rate-limiting visible durante las pruebas.
+
+2. IMPLEMENTACION CON KARATE
+----------------------------
+
+Hallazgos:
+- Karate 1.5.1 cambio su groupId de Maven de "com.intuit.karate" a
+  "io.karatelabs", lo cual no esta documentado en muchas fuentes.
+- El mecanismo karate.set()/karate.get() para compartir variables entre
+  escenarios no funciona de manera confiable cuando se usa
+  Karate.run().relativeTo(), ya que cada escenario tiene su propio
+  ScenarioRuntime.
+- Para compartir datos entre escenarios fue necesario implementar una clase
+  Java auxiliar (TestContext) con variables estaticas.
+- El orden de ejecucion de los escenarios es critico: el login exitoso
+  depende del usuario creado en el primer escenario de signup.
+- Los archivos .feature en src/test/java no se copian automaticamente al
+  classpath de test. Fue necesario agregar configuracion de testResources
+  en el pom.xml.
+
+3. COBERTURA DE PRUEBAS
+-----------------------
+
+Hallazgos:
+- Se cubrieron los 4 casos solicitados en el enunciado:
+  1. Crear usuario nuevo en signup
+  2. Intentar crear usuario ya existente
+  3. Login con credenciales correctas
+  4. Login con credenciales incorrectas
+- Las validaciones cubren tanto la respuesta HTTP (status 200) como el
+  contenido del body (mensajes de exito/error).
+
+4. CONCLUSIONES
+---------------
+
+- Demoblaze es una API simple con comportamiento no estandar (HTTP 200 para
+  errores, formatos de respuesta inconsistentes), lo cual es comun en APIs
+  de practica/demo pero seria inaceptable en un entorno productivo.
+- Karate es una herramienta eficaz para pruebas de API REST, especialmente
+  por su sintaxis BDD y su capacidad de generar reportes HTML.
+- La configuracion del proyecto (Maven, Karate, JUnit 5) requiere atencion
+  a detalles como la ubicacion de archivos .feature y la compatibilidad de
+  versiones.
+- Para proyectos con escenarios dependientes, es recomendable consolidar
+  todos los escenarios en un solo archivo .feature y usar un mecanismo
+  confiable de comparticion de estado (clase Java auxiliar, singleton).
+- Se recomienda validar no solo el status code sino tambien el content-type
+  de la respuesta para detectar cambios inesperados en el formato.
+- Las pruebas son reproducibles: cada ejecucion genera un usuario aleatorio
+  con prefijo "test_", evitando colisiones entre ejecuciones.
+
+5. ESTRUCTURA FINAL DEL PROYECTO
+--------------------------------
+
+prueba-tecnica-v1-ejercicio-2/
+├── pom.xml
+├── karate-config.js
+├── README.txt
+├── conclusiones.txt
+└── src/test/java/demoblaze/
+    ├── DemoblazeTest.java      (Runner JUnit 5)
+    ├── TestContext.java         (Helper para compartir estado)
+    └── demoblaze.feature        (4 escenarios: signup + login)
+
+Ejecucion: mvn test -Dtest=DemoblazeTest

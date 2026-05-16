@@ -1,13 +1,13 @@
-# Prueba Técnica V1 Ejercicio 2
+Prueba Técnica V1 Ejercicio 2
 
-## Stack
+Stack
 
-- **IDE**  Vs Code
-- **Lenguajes** Java 21, Javascript
-- **Gestor de dependencias** Maven
-- **Framework** Karate  
-
-## Descripción
+- IDE:  Vs Code
+- Lenguajes: Java 21, Javascript
+- Gestor de dependencias: Maven
+- Framework: Karate  
+ 
+Descripción
 
 Probar los servicios REST de demoblaze.com (Signup y Login) usando Karate.
 
@@ -26,31 +26,26 @@ Identificar las entradas y capturar las salidas en cada uno de los siguientes ca
 - Usuario y password correcto en login
 - Usuario y password incorrecto en logi
 
-## Archivos de referencia
+¿Cómo ejecutar esta prueba?
 
-- Un archivo [readme.txt](/readme.txt)  con las instrucciones paso a paso de ejecución.
 
-- Un archivo [conclusiones.txt](/conclusiones.txt) con los hallazgos y conclusiones del ejercicio
-
-## ¿Cómo ejecutar esta prueba?
-
-1. Verifica que estés usando **Java 21**.
+1. Verifica que estés usando Java 21
 
 2. Para ejecutar todos los tests:
-   `mvn test -Dtest=DemoblazeTest`
+  mvn test -Dtest=DemoblazeTest
 
 3. Para compilar y ejecutar (limpio):
-   `mvn clean test -Dtest=DemoblazeTest`
+  mvn clean test -Dtest=DemoblazeTest
 
-## Reportes:
+Reportes:
 
 Los reportes HTML se generan en: target/karate-reports/
 Abrir karate-summary.html en un navegador para ver los resultados.
 
-### Casos de Prueba:
+Casos de Prueba:
+
 
 SIGNUP (POST https://api.demoblaze.com/signup):
-
   1. Crear usuario nuevo
      - Username: "test_<random>" (ej. test_4512)
      - Password: "Test123"
@@ -73,7 +68,7 @@ LOGIN (POST https://api.demoblaze.com/login):
      - Validacion: Status 200, errorMessage contiene "User does not exist"
 
 Notas Importantes:
-
+-----------------
 - El API siempre retorna HTTP 200, incluso en casos de error.
 - Las respuestas de exito son texto plano; los errores vienen en JSON.
 - La diferenciacion de casos se hace por el contenido del body.
